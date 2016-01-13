@@ -27,7 +27,7 @@ int executerPrise(int[NB_LIGNE][NB_COLONNE], int, int , int);
 
 int main(){
     int joueurCourant = 1; // Joueur courant reprÃ©sentÃ© soit par un 0 (joueur 1) soit par un 1 (joueur 2)
-    int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 0 a gagnÃ©, 2 si le joueur 1 a gagnÃ©, 3 si y a Ã©galitÃ©
+    int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 1 a gagnÃ©, 2 si le joueur 2 a gagnÃ©, 3 si y a Ã©galitÃ©
     int nbPrisesJ1 = 0, nbPrisesJ2 = 0, prise; // Nombres de prises par le joueur 1 puis le joueur 2
     int coordX, coordY; // Stocke les coordonnÃ©es entrÃ©es par le joueur courant
 
@@ -37,6 +37,7 @@ int main(){
 
     while (resultat == 0){
         afficherPlateau(plateau);
+        printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
         demandeCoordonnees(plateau, &coordX,&coordY); // Demande des coordonnÃ©es valides Ã  l'utilisateur
 
         printf("--> coordX : %d, coordY %d\n", coordX, coordY);
@@ -83,6 +84,7 @@ int main(){
     } else {
         printf("Egalite\n");
     }
+    printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
     return 0;
 }
 
