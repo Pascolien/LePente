@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
 
         initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau Ã  0
 
-        while (resultat == 0) {
+        while (resultat == 0 && nbPrisesJ1 < 10 && nbPrisesJ2 < 10) {
             afficherPlateau(plateau);
             printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
             demandeCoordonnees(plateau, &coordX, &coordY); // Demande des coordonnÃ©es valides Ã  l'utilisateur
@@ -83,9 +83,9 @@ int main(int argc, char *argv[]){
             }
         }
         afficherPlateau(plateau);
-        if (resultat == 1) {
+        if (resultat == 1 || nbPrisesJ1 >= 10) {
             printf("Joueur 1 a gagne\n");
-        } else if (resultat == 2) {
+        } else if (resultat == 2 || nbPrisesJ2 >= 10) {
             printf("Joueur 2 a gagne\n");
         } else {
             printf("Egalite\n");
