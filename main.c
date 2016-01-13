@@ -3,9 +3,8 @@
 //
 
 #include <stdio.h>
-
-#define NB_LIGNE 19
-#define NB_COLONNE 19
+#include <string.h>
+#include "test.h"
 
 typedef struct {
     int x;
@@ -21,66 +20,78 @@ int verificationEgalite(int[NB_LIGNE][NB_COLONNE]);
 int verificationGagner(int[NB_LIGNE][NB_COLONNE], int, int , int);
 int executerPrise(int[NB_LIGNE][NB_COLONNE], int, int , int);
 
-int main(){
+int main(int argc, char *argv[]){
     int joueurCourant = 1; // Joueur courant reprÃ©sentÃ© soit par un 0 (joueur 1) soit par un 1 (joueur 2)
     int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 1 a gagnÃ©, 2 si le joueur 2 a gagnÃ©, 3 si y a Ã©galitÃ©
     int nbPrisesJ1 = 0, nbPrisesJ2 = 0, prise; // Nombres de prises par le joueur 1 puis le joueur 2
     int coordX, coordY; // Stocke les coordonnÃ©es entrÃ©es par le joueur courant
-
     int plateau[NB_LIGNE][NB_COLONNE];
 
-    initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau Ã  0
-
-    while (resultat == 0){
-        afficherPlateau(plateau);
-        printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
-        demandeCoordonnees(plateau, &coordX,&coordY); // Demande des coordonnÃ©es valides Ã  l'utilisateur
-
-        printf("--> coordX : %d, coordY %d\n", coordX, coordY);
-
-
-        if (coordX != -1){ // Il n'y a pas d'abandon
-            plateau[coordX][coordY] = joueurCourant;
-
-            printf("--> Pion placé \n");
-
-            resultat = verificationGagner(plateau, coordX, coordY, joueurCourant);
-
-            printf("--> Verification Gagner OK \n");
-
-            if (resultat == 0){
-                printf("--> executerPrise : start\n");
-                prise = executerPrise(plateau, coordX,coordY,joueurCourant);
-                printf("--> executerPrise : done\n");
-                if (prise > 0){
-                    if (joueurCourant == 0){
-                        nbPrisesJ1 += prise;
-                    } else {
-                        nbPrisesJ2 += prise;
-                    }
-                } else {
-                    printf("--> VerificationEgalite : start\n");
-                    resultat = verificationEgalite(plateau);
-                    printf("--> VerificationEgalite : done\n");
-                    if (resultat != 0){
-                        resultat = 3;
-                    }
-                }
-                joueurCourant = joueurCourant % 2 + 1;
-            }
+    if (argc > 1) {
+        if (strcmp(argv[1], "--test-egalite") == 0) {
+            if (testEgalite(plateau))
+                printf("Egalite fonctionne\n");
+            else
+                printf("Egalite NE fonctionne PAS\n");
         } else {
-            resultat = joueurCourant % 2 + 1;
+            printf("Usage : ./a.out\nParamétre : \n\t--test-egalite : permet de tester si la fonction egalite fonctionne\n");
         }
-    }
-    afficherPlateau(plateau);
-    if (resultat == 1){
-        printf("Joueur 1 a gagne\n");
-    } else if (resultat == 2){
-        printf("Joueur 2 a gagne\n");
     } else {
-        printf("Egalite\n");
+
+
+        initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau Ã  0
+
+        while (resultat == 0) {
+            afficherPlateau(plateau);
+            printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
+            demandeCoordonnees(plateau, &coordX, &coordY); // Demande des coordonnÃ©es valides Ã  l'utilisateur
+
+            printf("--> coordX : %d, coordY %d\n", coordX, coordY);
+
+
+            if (coordX != -1) { // Il n'y a pas d'abandon
+                plateau[coordX][coordY] = joueurCourant;
+
+                printf("--> Pion placé \n");
+
+                resultat = verificationGagner(plateau, coordX, coordY, joueurCourant);
+
+                printf("--> Verification Gagner OK \n");
+
+                if (resultat == 0) {
+                    printf("--> executerPrise : start\n");
+                    prise = executerPrise(plateau, coordX, coordY, joueurCourant);
+                    printf("--> executerPrise : done\n");
+                    if (prise > 0) {
+                        if (joueurCourant == 0) {
+                            nbPrisesJ1 += prise;
+                        } else {
+                            nbPrisesJ2 += prise;
+                        }
+                    } else {
+                        printf("--> VerificationEgalite : start\n");
+                        resultat = verificationEgalite(plateau);
+                        printf("--> VerificationEgalite : done\n");
+                        if (resultat != 0) {
+                            resultat = 3;
+                        }
+                    }
+                    joueurCourant = joueurCourant % 2 + 1;
+                }
+            } else {
+                resultat = joueurCourant % 2 + 1;
+            }
+        }
+        afficherPlateau(plateau);
+        if (resultat == 1) {
+            printf("Joueur 1 a gagne\n");
+        } else if (resultat == 2) {
+            printf("Joueur 2 a gagne\n");
+        } else {
+            printf("Egalite\n");
+        }
+        printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
     }
-    printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
     return 0;
 }
 
