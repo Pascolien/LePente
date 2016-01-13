@@ -19,10 +19,6 @@ void afficherPlateau(int[NB_LIGNE][NB_COLONNE]);
 void demandeCoordonnees(int[NB_LIGNE][NB_COLONNE], int*,int*);
 int verificationEgalite(int[NB_LIGNE][NB_COLONNE]);
 int verificationGagner(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifColonne(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifLigne(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifDiagoDroite(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifDiagoGauche(int[NB_LIGNE][NB_COLONNE], int, int , int);
 int executerPrise(int[NB_LIGNE][NB_COLONNE], int, int , int);
 
 int main(){
@@ -120,68 +116,36 @@ int verificationEgalite(int plateau[NB_LIGNE][NB_COLONNE]){
 
 
 int verificationGagner(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int resultat = 0;
-    if (verifColonne(plateau, coordX, coordY, joueurCourant) == 5
-        || verifLigne(plateau, coordX, coordY, joueurCourant) == 5
-        || verifDiagoDroite(plateau, coordX, coordY,joueurCourant) == 5
-        || verifDiagoGauche(plateau,coordX,coordY,joueurCourant) == 5){
-        resultat = joueurCourant;
-    }
-    return resultat;
-}
-
-int verifColonne(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = coordX + 1, n = 1;
-    while ((n<5) && i < NB_LIGNE && plateau[i][coordY] == joueurCourant){
-        ++n;
+    int i = 0;
+    int n = 0;
+    while(i<4 && n < 5) {
+        int j = 1;
+        n = 1;
+        while (n < 5
+               && coordX + directions[i].x*j < NB_LIGNE
+               && coordX + directions[i].x*j >= 0
+               && coordY + directions[i].y*j < NB_COLONNE
+               && coordY + directions[i].y*j >= 0
+               && plateau[coordX + directions[i].x*j][coordY + directions[i].y*j] == joueurCourant) {
+            ++n;
+            ++j;
+        }
+        j = -1;
+        while (n < 5
+               && coordX + directions[i].x*j < NB_LIGNE
+               && coordX + directions[i].x*j >= 0
+               && coordY + directions[i].y*j < NB_COLONNE
+               && coordY + directions[i].y*j >= 0
+               && plateau[coordX + directions[i].x*j][coordY + directions[i].y*j] == joueurCourant) {
+            ++n;
+            --j;
+        }
         ++i;
     }
-    i=coordX - 1;
-    while (n<5 && i >= 0 && plateau[i][coordY] == joueurCourant){
-        ++n;
-        --i;
-    }
-    return n;
-}
-
-int verifLigne(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = coordY + 1, n =1;
-    while ((n<5) && i < NB_LIGNE && plateau[coordX][i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    i=coordY - 1;
-    while (n<5 && i >= 0 && plateau[coordX][i] == joueurCourant){
-        ++n;
-        --i;
-    }
-    return n;
-}
-
-int verifDiagoDroite(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = 1, n = 1;
-    while ((n<5) && coordX - i >= 0 && coordY + i < NB_LIGNE && plateau[coordX - i][coordY + i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    i= 1;
-    while (n<5 && coordX + i < NB_COLONNE && coordY - i >=0 && plateau[coordX + i][coordY - i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    return n;
-}
-
-int verifDiagoGauche(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = 1, n = 1;
-    while ((n<5) && coordX + i < NB_LIGNE && coordY - i >= 0 && plateau[coordX + i][coordY - i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    i= 1;
-    while (n<5 && coordX - i >= 0 && coordY + i < NB_COLONNE && plateau[coordX - i][coordY + i] == joueurCourant){
-        ++n;
-        ++i;
+    if (n == 5){
+        n = joueurCourant;
+    } else {
+        n = 0;
     }
     return n;
 }
