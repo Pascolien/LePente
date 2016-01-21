@@ -1,0 +1,29 @@
+Irène CAMPAGNE et Benoît VERHAEGHE
+GIS 3
+
+Analyse : Le Penté
+
+Pour modéliser le plateau de jeu du Penté, nous allons utiliser une matrice de dimension 19*19 de caractères.
+Chaque caractère de la matrice ne pourra prendre, au maximum, que trois valeurs différentes lors du jeu : '.', 'o', 'x'.
+Au début du jeu, l'ensemble des cases de la matrice est initialisé à '.' et le nombre de pions pris par chaque joueur est initialisé à 0.
+Le plateau de jeu est affiché pour permettre aux joueurs de visualiser le plateau avant leur coup.
+Les deux joueurs peuvent donc commencer le jeu. Le premier joueur est modélisé par les 'o'.
+Nous commençons par lui demander les coordonnées voulues pour son premier coup.
+
+Nous vérifions le coup voulu du joueur :
+Nous vérifions si les coordonnées sont bien définies dans la matrice (comprises entre (1;19))
+ou si les coordonnées sont (0;0) ce qui signifie que le joueur abandonne.
+Sinon nous lui redemandons des nouvelles coordonnées.
+Ensuite, si ce n'est pas un abandon, nous vérifions si la case de la matrice est libre (= '.').
+Sinon nous lui redemandons des nouvelles coordonnées.
+
+Si la vérification est correcte (si le coup répond à tous les critères), le pion est placé sur le jeu ou la partie est terminée si le joueur abandonne.
+Nous vérifions si ce nouveau pion permet au joueur de gagner : s'il a réalisé un alignement soit horizontalement, soit verticalement, soit diagonalement avec au minimum cinq pions.
+S'il n'a pas gagné, nous vérifions si son pion lui permet de réaliser une ou plusieurs prises.
+Si c'est le cas, nous procédons aux prises en enlevant les pions pris. Le nombre pion pris par ce joueur s'incrémente en conséquence.
+Si le joueur n'a ni gagné ni réalisé de prises, nous vérifions si le plateau de jeu contient encore une case de libre. Si non, le jeu s'arrête et personne ne gagne.
+Enfin, le plateau est affiché avec l'ensemble des modifications.
+
+S'il n'y a ni victoire, ni égalité (plus de places de libres dans le plateau), nous passons au joueur suivant modélisé par les 'x'.
+Le traitement du coup voulu est réalisé comme précédemment.
+Sinon, le jeu se termine et nous affichons le résultat de la partie.

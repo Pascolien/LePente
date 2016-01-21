@@ -1,0 +1,71 @@
+Irène CAMPAGNE et Benoît VERHAEGHE
+GIS 3
+
+Algorithmes : Le Penté
+
+NE PAS OUBLIER DE MARQUER LES DONNEES, LES DONNEES/RESULTATS, LES RESULTATS ET LES VARIABLES LOCALES.
+
+ACTION jeuPente_BI()
+
+  L : plateau : Matrice[19][19] de Entier
+      nbPrisesJ1, nbPrisesJ2 : entier {Nombres de prises par le joueur 1 puis le joueur 2}
+      prise : entier {Nombre de prise effectué pour un coup}
+      joueurCourant : entier {Joueur courant représenté soit par un 1 (joueur 1) soit par un 2 (joueur 2)}
+      resultat : entier {Vaut 0 si le jeu continue, 1 si le joueur 1 a gagné, 2 si le joueur 2 a gagné, 3 si y a égalité}
+      coordX, coordY : entier {Stocke les coordonnées entrées par le joueur courant}
+      
+    // Initialisation du jeu
+    resultat <- 0
+    nbPrisesJ1 <- 0 {Le nombre de pions pris par chaque joueur est initialisé à 0}
+    nbPrisesJ2 <- 0
+    joueurCourant <- 1 {Le joueur ayant les ronds commence}
+    initialiserPlateau(plateau) {Action permettant d'initialiser toutes les cases du plateau à 0}
+    
+
+    // Début du jeu
+    TANT QUE resultat = 0 ET nbPrisesJ1 < 10 ET nbPrisesJ2 < 10 FAIRE
+      affichePlateau(plateau)
+      AFFICHE "Nombre de prises du Joueur 1 :"
+      AFFICHE nbPriseJ1
+      AFFICHE "Nombre de prises du Joueur 2 :"
+      AFFICHE nbPriseJ2
+
+
+      demandeCoordonnees(plateau, coordX, coordY) {Demande des coordonnées valides à l'utilisateur}
+      SI coordX != 0 ALORS {S'il n'y a pas d'abandon}
+	plateau[coordX][coordY] <- joueurCourant
+	resultat <- verificationGagner(plateau, coordX, coordY, joueurCourant) 
+	SI resultat = 0 FAIRE
+          prise <- executerPrise(plateau, coordX, coordY, joueurCourant)
+	  SI prise >= 1 FAIRE
+            SI joueurCourant = 0 FAIRE
+              nbPrisesJ1 <- nbPrisesJ1 + prise
+            SINON 
+              nbPrisesJ2 <- nbPrisesJ2 + prise
+            FIN SI
+          SINON
+            SI verificationEgalite(plateau) FAIRE
+	      resultat <- 3 
+	  FIN SI
+          joueurCourant <- joueurCourant % 2 + 1
+	FIN SI 
+      SINON
+        resultat <- joueurCourant % 2 + 1
+      FIN SI
+    FIN TANT QUE
+
+    affichePlateau(plateau, coordX, coordY)
+    AFFICHE "Nombre de prises du Joueur 1 :"
+    AFFICHE nbPriseJ1
+    AFFICHE "Nombre de prises du Joueur 2 :"
+    AFFICHE nbPriseJ2
+    SI resultat = 1 OU nbPrisesJ1 >=10 FAIRE
+      AFFICHE "Joueur 1 a gagné"
+    SINON
+      SI resultat = 2 OU nbPrisesJ2 >= 10 FAIRE
+	AFFICHE "Joueur 2 a gagné"
+      SINON
+	AFFICHE "Égalité"
+      FIN SI
+    FIN SI
+FIN ACTION

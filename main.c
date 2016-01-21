@@ -3,80 +3,188 @@
 //
 
 #include <stdio.h>
-
-#define NB_LIGNE 19
-#define NB_COLONNE 19
+#include <string.h>
+#include "test.h"
 
 typedef struct {
     int x;
     int y;
 } Direction;
 
-Direction directions[] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}}; // C'est valeur correspondent à NORD | NORD-EST | EST | SUD-EST | SUD | SUD-OUEST | OUEST | NORD-OUEST
+Direction directions[] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}}; // C'est valeur correspondent Ã  NORD | NORD-EST | EST | SUD-EST | SUD | SUD-OUEST | OUEST | NORD-OUEST
+Direction victoire[5];
 
 void initialiserPlateau(int[NB_LIGNE][NB_COLONNE]);
 void afficherPlateau(int[NB_LIGNE][NB_COLONNE]);
 void demandeCoordonnees(int[NB_LIGNE][NB_COLONNE], int*,int*);
 int verificationEgalite(int[NB_LIGNE][NB_COLONNE]);
 int verificationGagner(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifColonne(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifLigne(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifDiagoDroite(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int verifDiagoGauche(int[NB_LIGNE][NB_COLONNE], int, int , int);
 int executerPrise(int[NB_LIGNE][NB_COLONNE], int, int , int);
+void afficherPlateauVictoire(int[NB_LIGNE][NB_COLONNE], int, int, int);
+int estDansVictoire(int, int);
 
-int main(){
-    int joueurCourant = 0; // Joueur courant représenté soit par un 0 (joueur 1) soit par un 1 (joueur 2)
-    int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 0 a gagné, 2 si le joueur 1 a gagné, 3 si y a égalité
+int main(int argc, char *argv[]){
+    int joueurCourant = 1; // Joueur courant reprÃ©sentÃ© soit par un 0 (joueur 1) soit par un 1 (joueur 2)
+    int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 1 a gagnÃ©, 2 si le joueur 2 a gagnÃ©, 3 si y a Ã©galitÃ©
     int nbPrisesJ1 = 0, nbPrisesJ2 = 0, prise; // Nombres de prises par le joueur 1 puis le joueur 2
-    int coordX, coordY; // Stocke les coordonnées entrées par le joueur courant
-
+    int coordX, coordY; // Stocke les coordonnÃ©es entrÃ©es par le joueur courant
     int plateau[NB_LIGNE][NB_COLONNE];
 
-    initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau à 0
-
-    while (resultat == 0){
-        afficherPlateau(plateau);
-        demandeCoordonnees(plateau, &coordX,&coordY); // Demande des coordonnées valides à l'utilisateur
-        if (coordX != -1){ // Il n'y a pas égalité
-            plateau[coordX][coordY] = joueurCourant + 1;
-            resultat = verificationGagner(plateau, coordX, coordY, joueurCourant + 1);
-            if (resultat == 0){
-                if ((prise = executerPrise(plateau, coordX, coordY, joueurCourant + 1))){
-                    if (joueurCourant == 0){
-                        nbPrisesJ1 += prise;
-                    } else {
-                        nbPrisesJ2 += prise;
-                    }
-                } else {
-                    resultat = verificationEgalite(plateau);
-                    if (resultat != 0){
-                        resultat = 3;
-                    }
-                }
-                joueurCourant = (joueurCourant+1)%2;
-            }
-        } else {
-            resultat = (joueurCourant+1)%2+1;
-        }
-    }
-    afficherPlateau(plateau);
-    if (resultat == 1){
-        printf("Joueur 1 a gagne");
-    } else if (resultat == 2){
-        printf("Joueur 2 a gagne");
+    if (argc > 1) {
+	    if (strcmp(argv[1], "--test") == 0) {
+		    if (testEgalite(plateau))
+			    printf("--> Egalite fonctionne\n");
+		    else
+			    printf("xx> Egalite NE fonctionne PAS\n");
+		    if (testVictoireHorizontal(plateau)) 
+			    printf("--> victoireHorizontal fonctionne\n");
+		    else
+			   printf("xx> victoireHorizontal NE fonctionne PAS\n");
+		    if (testVictoireVertical(plateau))
+			    printf("--> victoireVertical fonctionne\n");
+		    else
+			   printf("xx> victoireVertical NE fonctionne PAS\n");
+		    if (testVictoireDiagoDroite(plateau))
+			    printf("--> victoireDiagoDroite fonctionne\n");
+		    else
+			   printf("xx> victoireDiagoDroite NE fonctionne PAS\n");
+		    if (testVictoireDiagoGauche(plateau))
+			    printf("--> victoireDiagoGauche fonctionne\n");
+		    else
+			   printf("xx> victoireDiagoGauche NE fonctionne PAS\n");
+	    } else {
+		    printf("Usage : ./a.out\nParamétre : \n\t--test : permet de tester l'ensemble des fonctionnalitees du jeu\n");
+	    }
     } else {
-        printf("Egalite");
+
+
+        initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau Ã  0
+
+        while (resultat == 0 && nbPrisesJ1 < 10 && nbPrisesJ2 < 10) {
+            afficherPlateau(plateau);
+            printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
+            demandeCoordonnees(plateau, &coordX, &coordY); // Demande des coordonnÃ©es valides Ã  l'utilisateur
+
+            printf("--> coordX : %d, coordY %d\n", coordX, coordY);
+
+
+            if (coordX != -1) { // Il n'y a pas d'abandon
+                plateau[coordX][coordY] = joueurCourant;
+
+                printf("--> Pion placé \n");
+
+                resultat = verificationGagner(plateau, coordX, coordY, joueurCourant);
+
+                printf("--> Verification Gagner OK \n");
+
+                if (resultat == 0) {
+                    printf("--> executerPrise : start\n");
+                    prise = executerPrise(plateau, coordX, coordY, joueurCourant);
+                    printf("--> executerPrise : done\n");
+                    if (prise > 0) {
+                        if (joueurCourant == 0) {
+                            nbPrisesJ1 += prise;
+                        } else {
+                            nbPrisesJ2 += prise;
+                        }
+                    } else {
+                        printf("--> VerificationEgalite : start\n");
+                        resultat = verificationEgalite(plateau);
+                        printf("--> VerificationEgalite : done\n");
+			if (resultat != 0) {
+				resultat = 3;
+			}
+		    }
+		    joueurCourant = joueurCourant % 2 + 1;
+		}
+	    } else {
+		    resultat = joueurCourant % 2 + 1;
+	    }
+	}
+	if (coordX == -1){
+		if (resultat == 1){
+			afficherPlateau(plateau);
+			printf("Le joueur 1 a gagn� par abandon\n");
+		} else { 
+			afficherPlateau(plateau);
+			printf("Le joueur 2 a gagn� par abandon\n");
+		}
+	}
+	else if (nbPrisesJ1 >= 10) {
+		afficherPlateau(plateau);
+		printf("Joueur 1 a gagn� (nombre de pion pris : %d)\n", nbPrisesJ1);
+	} else if (nbPrisesJ2 >= 10){
+		afficherPlateau(plateau);
+		printf("Joueur 2 a gagn� (nombre de pion pris : %d)\n", nbPrisesJ2);
+	} else if (resultat == 1) {
+		afficherPlateauVictoire(plateau, coordX, coordY, resultat);
+		printf("Joueur 1 a gagn�\n");
+	} else if (resultat == 2) {
+		afficherPlateauVictoire(plateau, coordX, coordY, resultat);
+		printf("Joueur 2 a gagn�\n");
+	} else {
+		afficherPlateau(plateau);
+		printf("Egalite\n");
+	}
     }
     return 0;
+}
+
+void afficherPlateauVictoire(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int resultat){
+	int i, j;
+	printf("   ");
+	for (i=1;i<10;++i){
+		printf("%d  ",i);
+	}
+	for (i=10;i<NB_COLONNE + 1;++i){
+		printf("%d ",i);
+	}
+	printf("\n");
+	for (i = 0; i < NB_LIGNE; ++i) {
+		printf("%d ", i+1);
+		if (i < 9){
+			printf(" ");
+		}
+		for (j = 0; j < NB_COLONNE; ++j) {
+			if (plateau[i][j] == 0){
+				printf(".  ");
+			} else if (plateau[i][j] == 1){
+				if (resultat  == 1 && estDansVictoire(coordX,coordY)){
+					printf("\033[35mo  ");
+				} else {
+					printf("o  ");
+				}
+			} else {
+				if (resultat  == 2 && estDansVictoire(coordX,coordY)){
+					printf("\033[35mx  ");
+				} else {
+					printf("x  ");
+				}
+			}
+			printf("\033[0m");
+		}
+		printf("\n");
+	}
+
+}
+
+int estDansVictoire(int coordX, int coordY){
+	int resultat = 0;
+	int i = 0;
+	while (resultat == 0 && i < 5){
+		if (victoire[i].x == coordX && victoire[i].y == coordY){
+			resultat = 1;
+		}
+	}
+	return resultat;
 }
 
 int executerPrise(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
     int prise = 0,i, joueurAdverse = joueurCourant %2 + 1;
     for (i = 0;i<8;++i){
         if(coordX + directions[i].x * 3 >= 0 && coordX + directions[i].x * 3 < NB_LIGNE && coordY + directions[i].y * 3 >= 0 && coordY + directions[i].y * 3 < NB_COLONNE // On ne sort pas du tablea
-           && plateau[coordX + directions[i].x * 3][coordY + directions[i].y * 3] == joueurCourant    // Le pion à trois cases est notre pion
-           && plateau[coordX + directions[i].x][coordY + directions[i].y] == joueurAdverse  //Que le premier pion et le second appartiennent à l'adversaire
+           && plateau[coordX + directions[i].x * 3][coordY + directions[i].y * 3] == joueurCourant    // Le pion Ã  trois cases est notre pion
+           && plateau[coordX + directions[i].x][coordY + directions[i].y] == joueurAdverse  //Que le premier pion et le second appartiennent Ã  l'adversaire
            && plateau[coordX + directions[i].x * 2][coordY + directions[i].y * 2] == joueurAdverse){ // Alors
             plateau[coordX + directions[i].x][coordY + directions[i].y] = 0;
             plateau[coordX + directions[i].x * 2][coordY + directions[i].y * 2] = 0;
@@ -87,12 +195,15 @@ int executerPrise(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int
 }
 
 int verificationEgalite(int plateau[NB_LIGNE][NB_COLONNE]){
-    int i = 0, j = 0, resultat;
+    int i = 0, j, resultat;
     resultat = 1;
     while (resultat && i < NB_LIGNE){
+        j = 0;
         while (resultat && j < NB_COLONNE){
-            resultat = plateau[i][j] == 0;
+            resultat = plateau[i][j] != 0;
+            ++j;
         }
+        ++i;
     }
     return resultat;
 }
@@ -100,80 +211,57 @@ int verificationEgalite(int plateau[NB_LIGNE][NB_COLONNE]){
 
 
 int verificationGagner(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int resultat = 0;
-    if (verifColonne(plateau, coordX, coordY, joueurCourant) == 5
-            || verifLigne(plateau, coordX, coordY, joueurCourant) == 5
-            || verifDiagoDroite(plateau, coordX, coordY,joueurCourant) == 5
-            || verifDiagoGauche(plateau,coordX,coordY,joueurCourant) == 5){
-        resultat = joueurCourant;
-    }
-    return resultat;
-}
-
-int verifColonne(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = coordX + 1, n = 1;
-    while ((n<5) && i < NB_LIGNE && plateau[i][coordY] == joueurCourant){
-        ++n;
+    int i = 0;
+    int n = 0;
+    victoire[0].x = coordX;
+    victoire[0].y = coordY;
+    while(i<4 && n < 5) {
+        int j = 1;
+        n = 1;
+        while (n < 5
+               && coordX + directions[i].x*j < NB_LIGNE
+               && coordX + directions[i].x*j >= 0
+               && coordY + directions[i].y*j < NB_COLONNE
+               && coordY + directions[i].y*j >= 0
+               && plateau[coordX + directions[i].x*j][coordY + directions[i].y*j] == joueurCourant) {
+    		victoire[n].x = coordX + directions[i].x * j;
+    		victoire[n].y = coordY + directions[i].y * j;
+		++n;
+		++j;
+        }
+        j = -1;
+        while (n < 5
+               && coordX + directions[i].x*j < NB_LIGNE
+               && coordX + directions[i].x*j >= 0
+               && coordY + directions[i].y*j < NB_COLONNE
+               && coordY + directions[i].y*j >= 0
+               && plateau[coordX + directions[i].x*j][coordY + directions[i].y*j] == joueurCourant) {
+    		victoire[n].x = coordX + directions[i].x * j;
+    		victoire[n].y = coordY + directions[i].y * j;
+		++n;
+		--j;
+        }
         ++i;
     }
-    i=coordX - 1;
-    while (n<5 && i >= 0 && plateau[i][coordY] == joueurCourant){
-        ++n;
-        --i;
-    }
-    return n;
-}
-
-int verifLigne(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = coordY + 1, n =1;
-    while ((n<5) && i < NB_LIGNE && plateau[coordX][i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    i=coordY - 1;
-    while (n<5 && i >= 0 && plateau[coordX][i] == joueurCourant){
-        ++n;
-        --i;
-    }
-    return n;
-}
-
-int verifDiagoDroite(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = 1, n = 1;
-    while ((n<5) && coordX - i >= 0 && coordY + i < NB_LIGNE && plateau[coordX - i][coordY + i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    i= 1;
-    while (n<5 && coordX + i < NB_COLONNE && coordY - i >=0 && plateau[coordX + i][coordY - i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    return n;
-}
-
-int verifDiagoGauche(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int joueurCourant){
-    int i = 1, n = 1;
-    while ((n<5) && coordX + i < NB_LIGNE && coordY - i >= 0 && plateau[coordX + i][coordY - i] == joueurCourant){
-        ++n;
-        ++i;
-    }
-    i= 1;
-    while (n<5 && coordX - i >= 0 && coordY + i < NB_COLONNE && plateau[coordX - i][coordY + i] == joueurCourant){
-        ++n;
-        ++i;
+    if (n == 5){
+        n = joueurCourant;
+    } else {
+        n = 0;
     }
     return n;
 }
 
 
 void demandeCoordonnees(int plateau[NB_LIGNE][NB_COLONNE], int* coordX,int* coordY){
+	int testSscanf = 0;
+    char buffer[255];
     do{
-        printf("Donner les coordonnées de votre coup sous le format coordonneesX,coordonneesY : \n");
-        scanf("%d,%d",coordX,coordY);
+        printf("Donner les coordonnÃ©es de votre coup sous le format coordonneesX,coordonneesY : \n");
+        fgets(buffer, 255, stdin);
+        testSscanf = sscanf(buffer,"%d,%d",coordX,coordY);
         *coordX = *coordX - 1;
         *coordY = *coordY - 1;
-    } while (((*coordX<0 || *coordX>NB_LIGNE) || (*coordY<0 || *coordY>NB_COLONNE) || plateau[*coordX][*coordY] != 0) && (*coordX != -1 && *coordY != -1));
+    } while (testSscanf == 0 || (((*coordX<0 || *coordX>=NB_LIGNE) || (*coordY<0 || *coordY>=NB_COLONNE) || plateau[*coordX][*coordY] != 0) && (*coordX != -1 && *coordY != -1)));
 }
 
 
@@ -189,7 +277,7 @@ void afficherPlateau(int plateau[NB_LIGNE][NB_COLONNE]){
     printf("\n");
     for (i = 0; i < NB_LIGNE; ++i) {
         printf("%d ", i+1);
-        if (i < 10){
+        if (i < 9){
             printf(" ");
         }
         for (j = 0; j < NB_COLONNE; ++j) {

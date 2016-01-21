@@ -1,0 +1,144 @@
+STRUCTURE Direction :
+  x : entier
+  y : entier
+FIN STRUCTURE
+
+STRUCTURE Direction directions[] : {{-1,0}{-1,1}{0,1}{1,1}{1,0}{1,-1}{0,-1}{-1,-1}}     {C'est valeur correspondent à NORD | NORD-EST | EST | SUD-EST | SUD | SUD-OUEST | OUEST | NORD-OUEST}
+
+ACTION initialiserPlateau(plateau)
+  R : plateau : Matrice[19][19] de Entier
+  L : i, j : entier {indices de boucle}
+  POUR i de 1 à 19 FAIRE
+    POUR j de 1 à 19 FAIRE
+      plateau[i][j] <- 0
+    FIN POUR
+  FIN POUR
+FIN ACTION
+
+ACTION demandeCoordonnees(plateau, coordX, coordY)
+  D : plateau : Matrice[19][19] de entier
+  R : coordX, coordY : entiers {coordonnées du coup}
+  
+  AFFICHER "Donner les coordonnées de votre coup sous le format coordonnéeX,coordonnéeY :"
+  LIRE (coordX,coordY)
+
+  TANT QUE (((coordX < 1 OU coordX > 19) OU (coordY < 1 OU coordY > 19) OU plateau[coordX][coordY] != 0) ET (coordX != 0 OU coordY != 0))
+    AFFICHER "Donner les coordonnées de votre coup sous le format coordonnéeX,coordonnéeY :"
+    LIRE (coordX,coordY)
+  FIN TANT QUE
+FIN ACTION
+
+FONCTION verificationGagner(plateau, coordX, coordY, joueurCourant) : entier
+  D : plateau : Matrice[19][19] de entier
+      coordX, coordY : entier {coordonnées du coup}
+      joueurCourant : entier {1 si c'est le premier joueur, 2 si c'est le deuxième joueur}
+  L : resultat : entier {Vaut 0 si le jeu continue, sinon vaut le numéro du joueur gagnant}
+      i : entier { compteur de boucle}
+      n : entier { compteur de nombre aligne }
+      j : entier { compteur pour se dÃplacer sur les lignes et colonnes }
+
+      i <- 0
+      n <- 0
+
+      TANT QUE i < 4 ET n < 5 FAIRE
+	  j <- 1
+	  n <- 1
+	  TANT QUE n < 5
+			  ET coordX + directions[i].x*j < NB_LIGNE
+			  ET coordX + directions[i].x*j >= 0
+			  ET coordY + directions[i].y*j < NB_COLONNE
+			  ET coordY + directions[i].y*j >= 0
+			  ET plateau[coordX + directions[i].x*j][coordY + directions[i].y*j] = joueurCourant FAIRE
+		  n <- n + 1
+		  j <- j + 1
+	  FIN TANT QUE
+	  j <- -1
+	  TANT QUE n < 5
+			  ET coordX + directions[i].x*j < NB_LIGNE
+			  ET coordX + directions[i].x*j >= 0
+			  ET coordY + directions[i].y*j < NB_COLONNE
+			  ET coordY + directions[i].y*j >= 0
+			  ET plateau[coordX + directions[i].x*j][coordY + directions[i].y*j] = joueurCourant FAIRE
+		  n <- n + 1
+		  j <- j - 1
+	  FIN TANT QUE
+	  i <- i +1
+     FIN TANT QUE
+     SI n = 5 FAIRE
+       n <- joueurCourant
+     SINON
+       n <- 0
+     FIN SI
+     RETOURNER (n)
+FIN FONCTION
+
+FONCTION executerPrise(plateau, coordX, coordY, joueurCourant) : entier
+  D : coordX, coordY : entier
+      joueurCourant : entier {0 si c'est le premier joueur, 1 si c'est le deuxième joueur}
+  D/R : plateau : Matrice[19][19] de entier
+  L : prise : entier {Stcoke le nombre de prise}
+      joueurAdverse : entier {0 si c'est le premier joueur, 1 si c'est le deuxième joueur}
+      i : entier {Compteur de boucle}
+
+    prise <- 0
+    joueurAdverse <- joueurCourant %2 + 1
+    POUR i de 1 à 8 FAIRE 
+      SI coordX + directions[i].x*3 > 0 ET coordX + directions[i].x *3 < 20 ET coordY  + directions[i].y *3 > 0 ET coordY + directions[i].y*3  < 20 
+        ET plateau[coordX + directions[i].x * 3][coordY + directions[i].y * 3] = joueurCourant 
+	ET plateau[coordX  + directions[i].x ][coordY + directions[i].y] = joueurAdverse 
+        ET plateau[coordX + directions[i].x * 2][coordY + directions[i].y * 2] = joueurAdverse FAIRE
+	  plateau[coordX + directions[i].x][coordY + directions[i].y] <- 0
+	  plateau[coordX + directions[i].x * 2][coordY + directions[i].y * 2] <- 0
+	  prise <- prise + 2
+	FIN SI
+      FIN SI
+    FIN POUR
+  RETOURNER prise
+FIN FONCTION
+
+FONCTION verificationEgalite(plateau) : booléen
+  D : plateau : Matrice[19][19] de entier
+  L : resultat : booléen 
+      i, j : entier
+  resultat <- VRAI
+  i <- 1
+  TANT QUE resultat ET i < 19 FAIRE
+    j <- 1
+    i <- i + 1
+    TANT QUE resultat ET j < 19 FAIRE
+      resultat <- plateau[i][j] != 0
+      j <- j + 1
+    FIN TANT QUE
+  FIN TANT QUE
+  RETOURNER resultat
+FIN FONCTION
+
+ACTION affichePlateau(plateau)
+  D : plateau : Matrice[19][19] de entier
+  L : i, j entier
+  Afficher "   "
+  POUR i de 1 à 9 FAIRE
+    AFFICHER i + "  "
+  FIN POUR 
+  POUR i de 10 à 19 FAIRE
+    AFFICHER i + " "
+  FIN POUR 
+  POUR i de 1 à 19 FAIRE
+    AFFICHER i + " "
+    SI i < 10
+      AFFICHER " "
+    FIN SI
+    POUR j de 1 à 19 FAIRE
+      SI plateau[i][j] = 0 FAIRE
+        AFFICHER ".  "
+      SINON
+        SI plateau[i][j] = 1 FAIRE
+          AFFCIHER "o  "
+        SINON
+          AFFCIHER "x  "
+        FIN SI
+      FIN SI
+    FIN POUR
+    AFFICHER RETOUR A LA LIGNE 
+  FIN POUR
+FIN ACTION
