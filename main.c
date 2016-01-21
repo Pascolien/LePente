@@ -68,23 +68,11 @@ int main(int argc, char *argv[]){
             afficherPlateau(plateau);
             printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
             demandeCoordonnees(plateau, &coordX, &coordY); // Demande des coordonnees valides a  l'utilisateur
-
-            printf("--> coordX : %d, coordY %d\n", coordX, coordY);
-
-
             if (coordX != -1) { // Il n'y a pas d'abandon
                 plateau[coordX][coordY] = joueurCourant;
-
-                printf("--> Pion placé \n");
-
                 resultat = verificationGagner(plateau, coordX, coordY, joueurCourant);
-
-                printf("--> Verification Gagner OK \n");
-
                 if (resultat == 0) {
-                    printf("--> executerPrise : start\n");
                     prise = executerPrise(plateau, coordX, coordY, joueurCourant);
-                    printf("--> executerPrise : done\n");
                     if (prise > 0) {
                         if (joueurCourant == 0) {
                             nbPrisesJ1 += prise;
@@ -92,9 +80,7 @@ int main(int argc, char *argv[]){
                             nbPrisesJ2 += prise;
                         }
                     } else {
-                        printf("--> VerificationEgalite : start\n");
                         resultat = verificationEgalite(plateau);
-                        printf("--> VerificationEgalite : done\n");
 			if (resultat != 0) {
 				resultat = 3;
 			}
