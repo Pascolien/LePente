@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "main.h"
 #include "test.h"
 
 typedef struct {
@@ -11,23 +12,22 @@ typedef struct {
     int y;
 } Direction;
 
-Direction directions[] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}}; // C'est valeur correspondent Ã  NORD | NORD-EST | EST | SUD-EST | SUD | SUD-OUEST | OUEST | NORD-OUEST
+Direction directions[] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}}; // C'est valeur correspondent a  NORD | NORD-EST | EST | SUD-EST | SUD | SUD-OUEST | OUEST | NORD-OUEST
+
+
 Direction victoire[5];
 
+
 void initialiserPlateau(int[NB_LIGNE][NB_COLONNE]);
-void afficherPlateau(int[NB_LIGNE][NB_COLONNE]);
 void demandeCoordonnees(int[NB_LIGNE][NB_COLONNE], int*,int*);
-int verificationEgalite(int[NB_LIGNE][NB_COLONNE]);
-int verificationGagner(int[NB_LIGNE][NB_COLONNE], int, int , int);
-int executerPrise(int[NB_LIGNE][NB_COLONNE], int, int , int);
 void afficherPlateauVictoire(int[NB_LIGNE][NB_COLONNE], int, int, int);
 int estDansVictoire(int, int);
 
 int main(int argc, char *argv[]){
-    int joueurCourant = 1; // Joueur courant reprÃ©sentÃ© soit par un 0 (joueur 1) soit par un 1 (joueur 2)
-    int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 1 a gagnÃ©, 2 si le joueur 2 a gagnÃ©, 3 si y a Ã©galitÃ©
+    int joueurCourant = 1; // Joueur courant represente soit par un 0 (joueur 1) soit par un 1 (joueur 2)
+    int resultat = 0; // Vaut 0 si le jeu continue, 1 si le joueur 1 a gagne, 2 si le joueur 2 a gagne, 3 si y a egalite
     int nbPrisesJ1 = 0, nbPrisesJ2 = 0, prise; // Nombres de prises par le joueur 1 puis le joueur 2
-    int coordX, coordY; // Stocke les coordonnÃ©es entrÃ©es par le joueur courant
+    int coordX, coordY; // Stocke les coordonnees entrees par le joueur courant
     int plateau[NB_LIGNE][NB_COLONNE];
 
     if (argc > 1) {
@@ -52,18 +52,22 @@ int main(int argc, char *argv[]){
 			    printf("--> victoireDiagoGauche fonctionne\n");
 		    else
 			   printf("xx> victoireDiagoGauche NE fonctionne PAS\n");
+            if (testPrise(plateau) == 16)
+                printf("--> prise fonctionne\n");
+            else
+                printf("xx> prise NE fonctionne PAS\n");
 	    } else {
 		    printf("Usage : ./a.out\nParamétre : \n\t--test : permet de tester l'ensemble des fonctionnalitees du jeu\n");
 	    }
     } else {
 
 
-        initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau Ã  0
+        initialiserPlateau(plateau); // Action permettant d'initialiser toutes les cases du plateau a  0
 
         while (resultat == 0 && nbPrisesJ1 < 10 && nbPrisesJ2 < 10) {
             afficherPlateau(plateau);
             printf("Nombre de prises du Joueur 1: %d\nNombre de prises du Joueur 2 : %d\n", nbPrisesJ1, nbPrisesJ2);
-            demandeCoordonnees(plateau, &coordX, &coordY); // Demande des coordonnÃ©es valides Ã  l'utilisateur
+            demandeCoordonnees(plateau, &coordX, &coordY); // Demande des coordonnees valides a  l'utilisateur
 
             printf("--> coordX : %d, coordY %d\n", coordX, coordY);
 
@@ -104,24 +108,24 @@ int main(int argc, char *argv[]){
 	if (coordX == -1){
 		if (resultat == 1){
 			afficherPlateau(plateau);
-			printf("Le joueur 1 a gagn� par abandon\n");
+			printf("Le joueur 1 a gagne par abandon\n");
 		} else { 
 			afficherPlateau(plateau);
-			printf("Le joueur 2 a gagn� par abandon\n");
+			printf("Le joueur 2 a gagne par abandon\n");
 		}
 	}
 	else if (nbPrisesJ1 >= 10) {
 		afficherPlateau(plateau);
-		printf("Joueur 1 a gagn� (nombre de pion pris : %d)\n", nbPrisesJ1);
+		printf("Joueur 1 a gagne (nombre de pion pris : %d)\n", nbPrisesJ1);
 	} else if (nbPrisesJ2 >= 10){
 		afficherPlateau(plateau);
-		printf("Joueur 2 a gagn� (nombre de pion pris : %d)\n", nbPrisesJ2);
+		printf("Joueur 2 a gagne (nombre de pion pris : %d)\n", nbPrisesJ2);
 	} else if (resultat == 1) {
 		afficherPlateauVictoire(plateau, coordX, coordY, resultat);
-		printf("Joueur 1 a gagn�\n");
+		printf("Joueur 1 a gagne\n");
 	} else if (resultat == 2) {
 		afficherPlateauVictoire(plateau, coordX, coordY, resultat);
-		printf("Joueur 2 a gagn�\n");
+		printf("Joueur 2 a gagne\n");
 	} else {
 		afficherPlateau(plateau);
 		printf("Egalite\n");
@@ -183,8 +187,8 @@ int executerPrise(int plateau[NB_LIGNE][NB_COLONNE], int coordX, int coordY, int
     int prise = 0,i, joueurAdverse = joueurCourant %2 + 1;
     for (i = 0;i<8;++i){
         if(coordX + directions[i].x * 3 >= 0 && coordX + directions[i].x * 3 < NB_LIGNE && coordY + directions[i].y * 3 >= 0 && coordY + directions[i].y * 3 < NB_COLONNE // On ne sort pas du tablea
-           && plateau[coordX + directions[i].x * 3][coordY + directions[i].y * 3] == joueurCourant    // Le pion Ã  trois cases est notre pion
-           && plateau[coordX + directions[i].x][coordY + directions[i].y] == joueurAdverse  //Que le premier pion et le second appartiennent Ã  l'adversaire
+           && plateau[coordX + directions[i].x * 3][coordY + directions[i].y * 3] == joueurCourant    // Le pion a  trois cases est notre pion
+           && plateau[coordX + directions[i].x][coordY + directions[i].y] == joueurAdverse  //Que le premier pion et le second appartiennent a  l'adversaire
            && plateau[coordX + directions[i].x * 2][coordY + directions[i].y * 2] == joueurAdverse){ // Alors
             plateau[coordX + directions[i].x][coordY + directions[i].y] = 0;
             plateau[coordX + directions[i].x * 2][coordY + directions[i].y * 2] = 0;
@@ -256,7 +260,7 @@ void demandeCoordonnees(int plateau[NB_LIGNE][NB_COLONNE], int* coordX,int* coor
 	int testSscanf = 0;
     char buffer[255];
     do{
-        printf("Donner les coordonnÃ©es de votre coup sous le format coordonneesX,coordonneesY : \n");
+        printf("Donner les coordonnees de votre coup sous le format coordonneesX,coordonneesY : \n");
         fgets(buffer, 255, stdin);
         testSscanf = sscanf(buffer,"%d,%d",coordX,coordY);
         *coordX = *coordX - 1;

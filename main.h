@@ -7,7 +7,10 @@
 
     #define NB_LIGNE 19
     #define NB_COLONNE 19
-    int verificationEgalite(int plateau[NB_LIGNE][NB_COLONNE]);
-    int  verificationGagner(int plateau[NB_LIGNE][NB_COLONNE], int coordX,int coordY,int joueurCourant);
-    void afficherPlateau(int pateau[NB_LIGNE][NB_COLONNE]);
+
+    int verificationEgalite(int [NB_LIGNE][NB_COLONNE]);
+    int verificationGagner(int [NB_LIGNE][NB_COLONNE], int ,int ,int );
+    void afficherPlateau(int [NB_LIGNE][NB_COLONNE]);
+    int executerPrise(int[NB_LIGNE][NB_COLONNE], int, int , int);
+
 #endif //LEPENTE_MAIN_H

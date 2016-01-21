@@ -138,3 +138,34 @@ int testVictoireDiagoGauche(int plateau[NB_LIGNE][NB_COLONNE]){
 			}
 	return resultat;
 }
+
+int testPrise(int plateau[NB_LIGNE][NB_COLONNE]){
+	int i, j,  resultat = 0;
+
+	for (i = 0;i<NB_LIGNE;++i){
+		for (j = 0; j < NB_COLONNE;++j){
+			plateau[i][j] = 0;
+		}
+	}
+	for (i = 2;i<9;++i){
+		for (j=2;j<9;++j){
+			plateau[i][j] = 2;
+		}
+	}
+	for (i = 15;i<19;++i){
+		for (j=15;j<19;++j){
+			plateau[i][j] = 2;
+		}
+	}
+	plateau[5][5] = 1;
+	plateau[5][8] = 1;
+	plateau[8][8] = 1;
+	plateau[2][8] = 1;
+	plateau[2][5] = 1;
+	plateau[8][5] = 1;
+	plateau[2][2] = 1;
+	plateau[5][2] = 1;
+	plateau[8][2] = 1;
+	resultat = executerPrise(plateau,5,5,1) + executerPrise(plateau,17,17,1);
+	return resultat;
+}

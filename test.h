@@ -5,11 +5,10 @@
 #ifndef LEPENTE_TEST_H
 #define LEPENTE_TEST_H
 
-#include "main.h"
-
-int testEgalite(int plateau[NB_LIGNE][NB_COLONNE]);
-int testVictoireHorizontal(int plateau[NB_LIGNE][NB_COLONNE]);
-int testVictoireVertical(int plateau[NB_LIGNE][NB_COLONNE]);
-int testVictoireDiagoDroite(int plateau[NB_LIGNE][NB_COLONNE]);
-int testVictoireDiagoGauche(int plateau[NB_LIGNE][NB_COLONNE]);
+int testEgalite(int [NB_LIGNE][NB_COLONNE]);
+int testVictoireHorizontal(int [NB_LIGNE][NB_COLONNE]);
+int testVictoireVertical(int [NB_LIGNE][NB_COLONNE]);
+int testVictoireDiagoDroite(int [NB_LIGNE][NB_COLONNE]);
+int testVictoireDiagoGauche(int [NB_LIGNE][NB_COLONNE]);
+int testPrise(int [NB_LIGNE][NB_COLONNE]);
 #endif //LEPENTE_TEST_H
